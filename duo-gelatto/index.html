@@ -381,7 +381,6 @@
         <div class="hours-row">
           <div class="hstat"><b class="tabular" id="h-contratadas"></b><span>Horas contratadas</span></div>
           <div class="hstat"><b class="tabular" id="h-previstas"></b><span>Horas já agendadas</span></div>
-          <div class="hstat"><b class="tabular" id="h-realizadas"></b><span>Horas realizadas</span></div>
         </div>
         <div class="consume" id="consume-wrap" hidden>
           <div class="consume-lab"><span>Consumo real do contratado (agendas concluídas)</span><span class="tabular" id="consume-pct"></span></div>
@@ -1116,7 +1115,6 @@
 
     const contratadas = horasParaNumero(h.contratadas);
     const realizadas = horasRealizadas();
-    $('h-realizadas').textContent = Math.round(realizadas) + 'h';
 
     const wrap = $('consume-wrap');
     if(!contratadas){ wrap.hidden = true; return; }
