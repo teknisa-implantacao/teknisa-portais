@@ -1,0 +1,125 @@
+<title>Painel de Cronogramas — Pamela Maia</title>
+<meta name="description" content="Painel central dos portais de acompanhamento de cronograma dos clientes Teknisa.">
+<style>
+  :root{
+    --bg:#FFFFFF; --bg-2:#F8FAFC; --surface:#FFFFFF; --surface-2:#F1F5F9;
+    --ink:#0F172A; --ink-2:#64748B; --ink-3:#94A3B8; --border:#E2E8F0;
+    --accent:#0056B3; --accent-deep:#003087; --accent-tint:#EBF2FF;
+    --good:#15803D; --good-tint:#DCFCE7; --shadow: 0 8px 28px rgba(15,23,42,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0A1220; --bg-2:#0E1728; --surface:#101B30; --surface-2:#16223B;
+      --ink:#E8ECF6; --ink-2:#93A2BE; --ink-3:#5E6E90; --border:#1F2C4A;
+      --accent:#6FA3FF; --accent-deep:#9CC0FF; --accent-tint:#16223F;
+      --good:#4ADE80; --good-tint:#0F2A1B; --shadow: 0 8px 28px rgba(0,0,0,.45);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0A1220; --bg-2:#0E1728; --surface:#101B30; --surface-2:#16223B;
+    --ink:#E8ECF6; --ink-2:#93A2BE; --ink-3:#5E6E90; --border:#1F2C4A;
+    --accent:#6FA3FF; --accent-deep:#9CC0FF; --accent-tint:#16223F;
+    --good:#4ADE80; --good-tint:#0F2A1B; --shadow: 0 8px 28px rgba(0,0,0,.45);
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Inter',-apple-system,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased}
+  [hidden]{display:none!important}
+
+  #gate{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    background: radial-gradient(ellipse at 75% 10%, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 55%), var(--bg);}
+  .gate-card{width:100%; max-width:400px; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:40px 36px; box-shadow:var(--shadow)}
+  .gate-mark{font-size:13px; font-weight:800; letter-spacing:2.5px; color:var(--accent-deep); text-transform:uppercase; margin-bottom:6px}
+  .gate-title{font-size:22px; font-weight:800; letter-spacing:-.3px; margin-bottom:6px}
+  .gate-sub{font-size:13.5px; color:var(--ink-2); line-height:1.5; margin-bottom:26px}
+  #gate-input{width:100%; padding:13px 14px; font-size:15px; font-family:inherit; letter-spacing:1px; border:1.5px solid var(--border); border-radius:10px; background:var(--bg-2); color:var(--ink); outline:none}
+  #gate-input:focus{border-color:var(--accent)}
+  #gate-btn{width:100%; margin-top:14px; padding:13px; border:none; border-radius:10px; background:var(--accent-deep); color:#fff; font-family:inherit; font-size:14.5px; font-weight:700; cursor:pointer}
+  #gate-btn:hover{background:var(--accent)}
+  #gate-err{color:#B91C1C; font-size:12.5px; margin-top:12px; min-height:16px}
+
+  header.top{background:var(--accent-deep); color:#fff; padding:18px 0}
+  .wrap{max-width:1000px; margin:0 auto; padding:0 28px}
+  header.top .wrap{display:flex; align-items:center; gap:16px}
+  .mark{font-size:13px; font-weight:800; letter-spacing:2.5px; color:rgba(255,255,255,.55); text-transform:uppercase}
+  .top-title{font-size:14.5px; font-weight:700}
+
+  main{padding:40px 0 60px}
+  .eyebrow{font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:6px}
+  h2.stitle{font-size:26px; font-weight:800; letter-spacing:-.4px; margin:0 0 28px}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:18px}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:10px; text-decoration:none; color:inherit; transition:border-color .15s, transform .15s}
+  .card:hover{border-color:var(--accent); transform:translateY(-2px)}
+  .card-name{font-size:16.5px; font-weight:700; letter-spacing:-.2px}
+  .card-proj{font-size:12.5px; color:var(--ink-2)}
+  .card-code{margin-top:8px; font-size:11px; font-weight:700; letter-spacing:.5px; color:var(--accent-deep); background:var(--accent-tint); display:inline-block; padding:4px 10px; border-radius:20px; width:fit-content}
+  .card-arrow{margin-top:auto; font-size:12.5px; font-weight:700; color:var(--accent)}
+
+  footer{text-align:center; color:var(--ink-3); font-size:11.5px; padding:20px 0}
+</style>
+
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-mark">TEKNISA</div>
+    <div class="gate-title">Painel de Cronogramas</div>
+    <div class="gate-sub">Acesso restrito à coordenação de projetos.</div>
+    <input id="gate-input" type="text" autocomplete="off" spellcheck="false" placeholder="Código de acesso">
+    <button id="gate-btn">Entrar</button>
+    <div id="gate-err"></div>
+  </div>
+</div>
+
+<div id="hub" hidden>
+  <header class="top">
+    <div class="wrap">
+      <span class="mark">TEK<b>NISA</b></span>
+      <span class="top-title">Painel de Cronogramas</span>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="eyebrow">Clientes ativos</div>
+    <h2 class="stitle">Seus projetos</h2>
+    <div class="grid" id="grid"></div>
+  </main>
+  <footer>Cada portal busca os dados ao vivo direto da planilha do cliente — nada fica salvo aqui.</footer>
+</div>
+
+<script id="hub-data" type="application/json">{"meta": {"titulo": "Painel de Cronogramas — Pamela Maia", "codigo_admin": "ACESSOGERAL"}, "clientes": [{"nome": "Empório de Comidas", "projeto": "Retail – Empório de Comidas", "slug": "emporio-comidas", "codigo_cliente": "EMPORIO2026"}, {"nome": "Safari Fábrica", "projeto": "Teknisa Retail BRSS – Safari", "slug": "safari", "codigo_cliente": "SAFARI2026"}, {"nome": "Duo Gelatto", "projeto": "Retail BRSS – Duo Gelatto", "slug": "duo-gelatto", "codigo_cliente": "DUOGELATTO2026"}, {"nome": "Luss Cervejaria (Baden Baden)", "projeto": "Teknisa Retail BR – Luss Cervejaria", "slug": "luss-cervejaria", "codigo_cliente": "LUSS2026"}]}</script>
+<script>
+(function(){
+  const DADOS = JSON.parse(document.getElementById('hub-data').textContent);
+  const $ = (id) => document.getElementById(id);
+
+  function tryCode(){
+    const v = $('gate-input').value.trim().toUpperCase();
+    if(v === (DADOS.meta.codigo_admin || '').toUpperCase()){
+      try{ localStorage.setItem('hub_ok', '1'); }catch(e){}
+      unlock();
+    } else {
+      $('gate-err').textContent = 'Código inválido.';
+    }
+  }
+  function unlock(){
+    $('gate').hidden = true;
+    $('hub').hidden = false;
+    render();
+  }
+  $('gate-btn').addEventListener('click', tryCode);
+  $('gate-input').addEventListener('keydown', e => { if(e.key === 'Enter') tryCode(); });
+  try{ if(localStorage.getItem('hub_ok') === '1') unlock(); }catch(e){}
+
+  function escapeHtml(s){
+    return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function render(){
+    $('grid').innerHTML = DADOS.clientes.map(c => `
+      <a class="card" href="${escapeHtml(c.slug)}/">
+        <div class="card-name">${escapeHtml(c.nome)}</div>
+        <div class="card-proj">${escapeHtml(c.projeto || '')}</div>
+        <div class="card-code">código cliente: ${escapeHtml(c.codigo_cliente)}</div>
+        <div class="card-arrow">Abrir portal →</div>
+      </a>`).join('');
+  }
+})();
+</script>
