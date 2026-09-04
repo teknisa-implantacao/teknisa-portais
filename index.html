@@ -95,12 +95,15 @@
   }
 
   function tryCode(){
-    const v = limparCodigo($('gate-input').value);
+    const raw = $('gate-input').value;
+    const v = limparCodigo(raw);
     if(v === limparCodigo(DADOS.meta.codigo_admin)){
       try{ localStorage.setItem('hub_ok', '1'); }catch(e){}
       unlock();
     } else {
-      $('gate-err').textContent = 'Código inválido.';
+      $('gate-err').innerHTML = 'Código inválido.' +
+        '<br><span style="font-family:monospace; font-size:10.5px; opacity:.7">recebido: "' + escapeHtml(raw) +
+        '" (' + raw.length + ' car.) · limpo: "' + escapeHtml(v) + '"</span>';
     }
   }
   function unlock(){
