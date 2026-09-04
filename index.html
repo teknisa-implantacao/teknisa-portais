@@ -63,7 +63,7 @@
     <div class="gate-mark">TEKNISA</div>
     <div class="gate-title">Painel de Cronogramas</div>
     <div class="gate-sub">Acesso restrito à coordenação de projetos.</div>
-    <input id="gate-input" type="text" autocomplete="off" spellcheck="false" placeholder="Código de acesso">
+    <input id="gate-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="Código de acesso">
     <button id="gate-btn">Entrar</button>
     <div id="gate-err"></div>
   </div>
@@ -90,9 +90,13 @@
   const DADOS = JSON.parse(document.getElementById('hub-data').textContent);
   const $ = (id) => document.getElementById(id);
 
+  function limparCodigo(s){
+    return (s||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Z0-9]/g, '');
+  }
+
   function tryCode(){
-    const v = $('gate-input').value.trim().toUpperCase();
-    if(v === (DADOS.meta.codigo_admin || '').toUpperCase()){
+    const v = limparCodigo($('gate-input').value);
+    if(v === limparCodigo(DADOS.meta.codigo_admin)){
       try{ localStorage.setItem('hub_ok', '1'); }catch(e){}
       unlock();
     } else {
