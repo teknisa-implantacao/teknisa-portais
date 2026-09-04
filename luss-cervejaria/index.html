@@ -137,6 +137,64 @@
   .load-text{font-size:14px; color:var(--ink-2)}
   .load-retry{padding:9px 18px; border-radius:8px; border:1.5px solid var(--accent); background:var(--accent-tint); color:var(--accent-deep); font-family:inherit; font-size:13px; font-weight:700; cursor:pointer}
 
+  /* ---------- ROLLOUT VIEW ---------- */
+  .rk-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:28px}
+  .rk-card{background:var(--surface); border:1px solid var(--border); border-top:3px solid var(--rk-accent, var(--ink-3)); border-radius:12px; padding:18px; cursor:pointer; transition:.15s}
+  .rk-card:hover{transform:translateY(-1px)}
+  .rk-card.on{background:var(--accent-tint); border-color:var(--rk-accent, var(--accent))}
+  .rk-num{font-size:28px; font-weight:800; letter-spacing:-.5px; color:var(--ink)}
+  .rk-lbl{font-size:12px; color:var(--ink-2); margin-top:6px; line-height:1.4}
+  .rk-pct{font-size:11px; color:var(--ink-3); margin-top:4px}
+
+  .rk-funnel{display:grid; grid-template-columns:repeat(5, 1fr); gap:10px; align-items:center; margin-bottom:28px}
+  .rk-scoop{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 10px; text-align:center}
+  .rk-scoop .n{font-size:22px; font-weight:800; color:var(--rk-flavor, var(--accent))}
+  .rk-scoop .t{font-size:11px; color:var(--ink-2); margin-top:4px}
+  .rk-arrow{text-align:center; color:var(--ink-3); font-size:16px}
+  @media (max-width:760px){.rk-funnel{grid-template-columns:1fr}.rk-arrow{display:none}}
+
+  .rk-split{display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-bottom:28px}
+  @media (max-width:760px){.rk-split{grid-template-columns:1fr}}
+  .rk-panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px}
+  .rk-panel h4{font-size:13px; font-weight:700; margin:0 0 14px}
+  .rk-agenda-row{display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid var(--surface-2); font-size:13px}
+  .rk-agenda-row:last-child{border-bottom:none}
+  .rk-agenda-date{font-family:monospace; font-size:11.5px; background:var(--surface-2); padding:3px 8px; border-radius:6px; flex-shrink:0}
+  .rk-agenda-unit{flex:1; color:var(--ink)}
+  .rk-agenda-owner{font-size:11px; color:var(--ink-2)}
+  .rk-team-row{margin-bottom:10px}
+  .rk-team-top{display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px}
+  .rk-team-track{height:6px; background:var(--surface-2); border-radius:4px; overflow:hidden}
+  .rk-team-fill{height:100%; background:var(--accent); border-radius:4px}
+
+  .rk-table-section{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px}
+  .rk-controls{display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px}
+  .rk-filters{display:flex; gap:8px; flex-wrap:wrap}
+  .rk-filter-btn{font-size:12px; font-weight:600; color:var(--ink-2); background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:6px 13px; cursor:pointer}
+  .rk-filter-btn.on{background:var(--accent-deep); color:#fff; border-color:var(--accent-deep)}
+  .rk-search{background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:7px 14px; font-size:12.5px; color:var(--ink); font-family:inherit; min-width:200px}
+  .rk-table-wrap{overflow-x:auto}
+  table.rk-table{width:100%; border-collapse:collapse; min-width:760px}
+  table.rk-table th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-2); font-weight:700; padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap}
+  table.rk-table td{padding:9px 10px; font-size:12.5px; border-bottom:1px solid var(--surface-2); color:var(--ink); vertical-align:middle}
+  .rk-unit-name{font-weight:700}
+  .rk-unit-norg{display:block; font-size:10.5px; color:var(--ink-3); font-family:monospace}
+  .rk-dots{display:flex; gap:4px}
+  .rk-dot{width:8px; height:8px; border-radius:2px}
+  .rk-dot.done{background:var(--good)}
+  .rk-dot.mid{background:var(--warn)}
+  .rk-dot.pending{background:var(--border)}
+  .rk-progress-cell{display:flex; align-items:center; gap:8px; min-width:100px}
+  .rk-progress-track{flex:1; height:6px; background:var(--surface-2); border-radius:4px; overflow:hidden}
+  .rk-progress-fill{height:100%; border-radius:4px}
+  .rk-badge{font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:6px; white-space:nowrap}
+  .rk-badge.live{background:var(--good-tint); color:var(--good)}
+  .rk-badge.andamento{background:var(--warn-tint); color:var(--warn)}
+  .rk-badge.pendente{background:var(--surface-2); color:var(--ink-2)}
+  .rk-note{font-size:11px; color:var(--ink-2); max-width:220px; white-space:normal}
+  .rk-legend{display:flex; gap:16px; flex-wrap:wrap; padding-top:14px; font-size:11px; color:var(--ink-2)}
+  .rk-legend span{display:inline-flex; align-items:center; gap:6px}
+
   #unsupported-note{
     padding:40px 24px; text-align:center; color:var(--ink-2); font-size:14px; line-height:1.6;
     border:1.5px dashed var(--border); border-radius:14px; margin-bottom:24px;
@@ -259,6 +317,7 @@
     <div id="content-wrap" hidden>
     <div class="scope-tabs" id="scope-tabs"></div>
     <div id="unsupported-note" hidden></div>
+    <div id="rollout-view" hidden></div>
     <div id="normal-views">
     <section class="hero">
       <div class="hero-card next-card">
@@ -320,7 +379,8 @@
   let ITEMS = RAW.itens; // cada item carrega sheet_id
   let HORAS_BY_SHEET = {}; // sheet_id -> {contratadas, previstas}
   SHEETS.forEach(s => { HORAS_BY_SHEET[s.id] = { contratadas: s.horas_contratadas, previstas: s.horas_previstas_total }; });
-  let SYNC_STATE = {}; // sheet_id -> 'live' | 'snapshot'
+  let SYNC_STATE = {}; // sheet_id -> 'live' | 'rollout' | 'unsupported' | 'snapshot'
+  let ROLLOUT_DATA = {}; // sheet_id -> { fases, unidades } (planilhas em formato de matriz de rollout)
   let LAST_SYNC = null;
   let CURRENT_SCOPE = 'geral'; // 'geral' ou um sheet.id
   let ROLE = null; // 'cliente' | 'admin'
@@ -429,20 +489,27 @@
       const res = await fetch(sheet.csv_url, { cache: 'no-store' });
       if(!res.ok) throw new Error('http ' + res.status);
       const text = await res.text();
-      const parsed = parseCronogramaCsv(text, HORAS_BY_SHEET[sheet.id]);
-      return { id: sheet.id, parsed };
+      const agenda = parseCronogramaCsv(text, HORAS_BY_SHEET[sheet.id]);
+      if(agenda.formatoReconhecido) return { id: sheet.id, tipo: 'agenda', parsed: agenda };
+      const rollout = parseRolloutCsv(text);
+      if(rollout.reconhecido) return { id: sheet.id, tipo: 'rollout', parsed: rollout };
+      return { id: sheet.id, tipo: 'desconhecido', parsed: null };
     }));
 
     let anyLive = false;
     results.forEach((r, idx) => {
       const sheetId = SHEETS[idx].id;
-      if(r.status === 'fulfilled' && r.value.parsed.formatoReconhecido === false){
-        // a planilha respondeu, mas não está no formato de agenda (ex.: uma matriz
-        // de acompanhamento de rollout) — não é uma falha de conexão, é só um tipo
-        // de conteúdo que esta visão ainda não sabe desenhar.
+      if(r.status === 'fulfilled' && r.value.tipo === 'rollout'){
+        ROLLOUT_DATA[sheetId] = r.value.parsed;
+        SYNC_STATE[sheetId] = 'rollout';
+        anyLive = true;
+      } else if(r.status === 'fulfilled' && r.value.tipo === 'desconhecido'){
+        // a planilha respondeu, mas não está em nenhum formato reconhecido (agenda
+        // ou matriz de rollout) — não é uma falha de conexão, é só um tipo de
+        // conteúdo que esta visão ainda não sabe desenhar.
         SYNC_STATE[sheetId] = 'unsupported';
         HORAS_BY_SHEET[sheetId] = HORAS_BY_SHEET[sheetId] || {};
-      } else if(r.status === 'fulfilled' && r.value.parsed.itens.length){
+      } else if(r.status === 'fulfilled' && r.value.tipo === 'agenda' && r.value.parsed.itens.length){
         ITEMS = ITEMS.filter(i => i.sheet_id !== sheetId)
           .concat(r.value.parsed.itens.map(it => Object.assign(it, { sheet_id: sheetId })));
         HORAS_BY_SHEET[sheetId] = r.value.parsed.horas;
@@ -454,7 +521,7 @@
       }
     });
 
-    const anyResponded = Object.values(SYNC_STATE).some(v => v === 'live' || v === 'unsupported');
+    const anyResponded = Object.values(SYNC_STATE).some(v => v === 'live' || v === 'rollout' || v === 'unsupported');
     if(anyLive) LAST_SYNC = new Date();
     if(anyResponded){
       LOADED = true;
@@ -475,7 +542,7 @@
 
   function updateSyncLabel(){
     const el = $('hd-updated');
-    const liveCount = Object.values(SYNC_STATE).filter(v => v === 'live').length;
+    const liveCount = Object.values(SYNC_STATE).filter(v => v === 'live' || v === 'rollout').length;
     if(liveCount === SHEETS.length && LAST_SYNC){
       el.textContent = 'Ao vivo · sincronizado às ' + LAST_SYNC.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
     } else if(liveCount > 0){
@@ -598,6 +665,225 @@
     return { itens, horas, formatoReconhecido: true };
   }
 
+  // Segundo formato reconhecido: matriz de acompanhamento de rollout por unidade
+  // (ex.: franquias). Estrutura: uma linha de grupos de fase ("Fase 1", "Fase 2"...),
+  // uma linha de rótulos de campo, uma linha de tipo de campo (Status/Quantidade/
+  // Observação), e uma linha por unidade. Os limites de cada fase e quais colunas
+  // contam como checkpoint são descobertos a partir do próprio cabeçalho — não são
+  // posições fixas — então continua funcionando se colunas forem adicionadas/
+  // reordenadas na planilha.
+  const NOTA_IGNORAR = ['CONCLUIDO','SIM','NAO','X','-',''];
+
+  function parseRolloutCsv(text){
+    const rows = parseCsv(text);
+    const groupIdx = rows.findIndex(r => normHeader(r[0]) === 'FRANQUIAS');
+    if(groupIdx === -1) return { reconhecido: false };
+    const groupRow = rows[groupIdx] || [];
+    const labelRow = rows[groupIdx+1] || [];
+    const typeRow = rows[groupIdx+2] || [];
+    const dataRows = rows.slice(groupIdx+3);
+
+    const phaseStarts = [];
+    groupRow.forEach((c,i) => { if(/^FASE\s*\d+/i.test((c||'').trim())) phaseStarts.push({ i, label: (c||'').trim() }); });
+    if(!phaseStarts.length) return { reconhecido: false };
+    const fases = phaseStarts.map((p, idx) => ({
+      num: idx+1, label: p.label,
+      start: p.i, end: idx+1 < phaseStarts.length ? phaseStarts[idx+1].i : groupRow.length
+    }));
+
+    let ownerCol = -1, viradaCol = -1;
+    labelRow.forEach((c,i) => { if(/stakeholder/i.test(c||'')) ownerCol = i; });
+    groupRow.forEach((c,i) => { if(/data virada/i.test(c||'')) viradaCol = i; });
+
+    const unidades = [];
+    let uid = 1;
+    for(const r of dataRows){
+      const nomeRaw = (r[0]||'').trim();
+      if(!nomeRaw) continue;
+      const m = nomeRaw.match(/^(.*?)\s*-?\s*Norg:\s*(\S+)/i);
+      const nome = m ? m[1].trim() : nomeRaw;
+      const norg = m ? m[2] : '—';
+
+      let totalDone = 0, totalAplic = 0;
+      const fasesDot = fases.map(f => {
+        let done = 0, aplic = 0;
+        for(let c = f.start; c < f.end; c++){
+          if(normHeader(typeRow[c]) !== 'STATUS') continue;
+          const v = normHeader(r[c]);
+          if(v === 'X') continue; // não aplicável — fora do denominador
+          aplic++;
+          if(v === 'CONCLUIDO' || v === 'SIM') done++;
+        }
+        totalDone += done; totalAplic += aplic;
+        return aplic === 0 ? 'pending' : (done === aplic ? 'done' : (done > 0 ? 'mid' : 'pending'));
+      });
+
+      const progress = totalAplic ? Math.round(totalDone/totalAplic*100) : 0;
+      const status = progress === 100 ? 'live' : (progress === 0 ? 'pendente' : 'andamento');
+      const notas = [];
+      r.forEach((c,i) => {
+        const cv = (c||'').trim();
+        if(normHeader(typeRow[i]) === 'OBSERVACAO' && cv && !NOTA_IGNORAR.includes(normHeader(cv))) notas.push(cv);
+      });
+
+      unidades.push({
+        uid: uid++,
+        nome, norg,
+        owner: ownerCol >= 0 ? (r[ownerCol]||'').trim() : '',
+        virada: viradaCol >= 0 ? (r[viradaCol]||'').trim() : '',
+        fases: fasesDot,
+        progress, status,
+        nota: notas.join(' · '),
+      });
+    }
+    return { reconhecido: true, fases: fases.map(f => f.label), unidades };
+  }
+
+  let ROLLOUT_FILTER = 'all';
+  let ROLLOUT_SEARCH = '';
+
+  function renderRolloutView(sheetId){
+    const data = ROLLOUT_DATA[sheetId];
+    const el = $('rollout-view');
+    if(!data || !data.unidades.length){
+      el.innerHTML = '<div class="week-empty">Sem unidades nesta planilha.</div>';
+      return;
+    }
+    const unidades = data.unidades;
+    const total = unidades.length;
+    const live = unidades.filter(u => u.status === 'live');
+    const andamento = unidades.filter(u => u.status === 'andamento');
+    const pendente = unidades.filter(u => u.status === 'pendente');
+    const pct = (n) => total ? Math.round(n/total*100) : 0;
+
+    // funil: quantas unidades já têm pelo menos 1 checkpoint feito em cada fase
+    const funilCounts = data.fases.map((label, idx) =>
+      unidades.filter(u => u.fases[idx] === 'done' || u.fases[idx] === 'mid').length
+    );
+
+    // agenda de virada: unidades com data de virada reconhecível (dd/mm), ordenada
+    const agenda = unidades
+      .map(u => { const m = (u.virada||'').match(/(\d{2}\/\d{2})/); return m ? { ...u, dataCurta: m[1] } : null; })
+      .filter(Boolean)
+      .sort((a,b) => a.dataCurta.localeCompare(b.dataCurta))
+      .slice(0, 8);
+
+    // distribuição por responsável
+    const porResp = {};
+    unidades.forEach(u => { const k = u.owner || 'Sem responsável definido'; porResp[k] = (porResp[k]||0) + 1; });
+    const respMax = Math.max(1, ...Object.values(porResp));
+
+    function unidadesFiltradas(){
+      let list = unidades;
+      if(ROLLOUT_FILTER !== 'all') list = list.filter(u => u.status === ROLLOUT_FILTER);
+      if(ROLLOUT_SEARCH) list = list.filter(u =>
+        u.nome.toLowerCase().includes(ROLLOUT_SEARCH) || (u.owner||'').toLowerCase().includes(ROLLOUT_SEARCH));
+      return list;
+    }
+
+    const STATUS_LBL = { live: 'Live', andamento: 'Em andamento', pendente: 'Pendente' };
+    const FLAVORS = ['#94A3B8', 'var(--accent)', 'var(--warn)', 'var(--good)', 'var(--good)'];
+
+    function tableRows(){
+      return unidadesFiltradas().map(u => `
+        <tr>
+          <td><span class="rk-unit-name">${escapeHtml(u.nome)}</span><span class="rk-unit-norg">Norg ${escapeHtml(u.norg)}</span></td>
+          <td>${u.owner ? escapeHtml(u.owner) : '<span style="color:var(--ink-3); font-style:italic">a definir</span>'}</td>
+          ${u.fases.map(f => `<td><div class="rk-dots"><div class="rk-dot ${f}"></div></div></td>`).join('')}
+          <td style="font-family:monospace; font-size:11.5px">${escapeHtml(u.virada || '—')}</td>
+          <td><div class="rk-progress-cell"><div class="rk-progress-track"><div class="rk-progress-fill" style="width:${u.progress}%; background:${u.status==='live'?'var(--good)':u.status==='andamento'?'var(--warn)':'var(--ink-3)'}"></div></div><span>${u.progress}%</span></div></td>
+          <td><span class="rk-badge ${u.status}">${STATUS_LBL[u.status]}</span></td>
+          <td class="rk-note">${escapeHtml(u.nota || '')}</td>
+        </tr>`).join('');
+    }
+
+    el.innerHTML = `
+      <div class="rk-grid">
+        <div class="rk-card ${ROLLOUT_FILTER==='all'?'on':''}" data-f="all" style="--rk-accent:#94A3B8">
+          <div class="rk-num">${total}</div><div class="rk-lbl">Total de unidades</div><div class="rk-pct">100%</div>
+        </div>
+        <div class="rk-card ${ROLLOUT_FILTER==='live'?'on':''}" data-f="live" style="--rk-accent:var(--good)">
+          <div class="rk-num">${live.length}</div><div class="rk-lbl">Live (virada concluída)</div><div class="rk-pct">${pct(live.length)}% do total</div>
+        </div>
+        <div class="rk-card ${ROLLOUT_FILTER==='andamento'?'on':''}" data-f="andamento" style="--rk-accent:var(--warn)">
+          <div class="rk-num">${andamento.length}</div><div class="rk-lbl">Em andamento</div><div class="rk-pct">${pct(andamento.length)}% do total</div>
+        </div>
+        <div class="rk-card ${ROLLOUT_FILTER==='pendente'?'on':''}" data-f="pendente" style="--rk-accent:#94A3B8">
+          <div class="rk-num">${pendente.length}</div><div class="rk-lbl">Pendentes — não iniciadas</div><div class="rk-pct">${pct(pendente.length)}% do total</div>
+        </div>
+      </div>
+
+      <div class="rk-funnel">
+        ${data.fases.map((label, idx) => `
+          <div class="rk-scoop" style="--rk-flavor:${FLAVORS[idx+1] || 'var(--accent)'}">
+            <div class="n">${funilCounts[idx]}</div><div class="t">${escapeHtml(label.replace(/\s*\(.*?\)/, ''))}</div>
+          </div>
+          ${idx < data.fases.length-1 ? '<div class="rk-arrow">→</div>' : ''}
+        `).join('')}
+      </div>
+
+      <div class="rk-split">
+        <div class="rk-panel">
+          <h4>Próximas viradas</h4>
+          ${agenda.length ? agenda.map(u => `
+            <div class="rk-agenda-row">
+              <span class="rk-agenda-date">${u.dataCurta}</span>
+              <span class="rk-agenda-unit">${escapeHtml(u.nome)}</span>
+              <span class="rk-agenda-owner">${escapeHtml(u.owner || '')}</span>
+            </div>`).join('') : '<div class="week-empty">Nenhuma data de virada identificada.</div>'}
+        </div>
+        <div class="rk-panel">
+          <h4>Distribuição por responsável</h4>
+          ${Object.entries(porResp).sort((a,b) => b[1]-a[1]).map(([nome, n]) => `
+            <div class="rk-team-row">
+              <div class="rk-team-top"><span>${escapeHtml(nome)}</span><span>${n} unidade${n>1?'s':''}</span></div>
+              <div class="rk-team-track"><div class="rk-team-fill" style="width:${Math.round(n/respMax*100)}%"></div></div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="rk-table-section">
+        <div class="rk-controls">
+          <div class="rk-filters" id="rk-filters">
+            <button class="rk-filter-btn ${ROLLOUT_FILTER==='all'?'on':''}" data-f="all">Todas (${total})</button>
+            <button class="rk-filter-btn ${ROLLOUT_FILTER==='live'?'on':''}" data-f="live">Live (${live.length})</button>
+            <button class="rk-filter-btn ${ROLLOUT_FILTER==='andamento'?'on':''}" data-f="andamento">Em andamento (${andamento.length})</button>
+            <button class="rk-filter-btn ${ROLLOUT_FILTER==='pendente'?'on':''}" data-f="pendente">Pendentes (${pendente.length})</button>
+          </div>
+          <input type="text" class="rk-search" id="rk-search" placeholder="Buscar unidade ou responsável…" value="${escapeHtml(ROLLOUT_SEARCH)}">
+        </div>
+        <div class="rk-table-wrap">
+          <table class="rk-table">
+            <thead><tr>
+              <th>Unidade</th><th>Responsável</th>
+              ${data.fases.map((_,i) => `<th>F${i+1}</th>`).join('')}
+              <th>Virada</th><th>Progresso</th><th>Status</th><th>Observação</th>
+            </tr></thead>
+            <tbody id="rk-tbody">${tableRows()}</tbody>
+          </table>
+        </div>
+        <div class="rk-legend">
+          <span><span class="rk-dot done"></span>Concluído</span>
+          <span><span class="rk-dot mid"></span>Em andamento</span>
+          <span><span class="rk-dot pending"></span>Pendente</span>
+        </div>
+      </div>
+    `;
+
+    el.querySelectorAll('.rk-card, .rk-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        ROLLOUT_FILTER = btn.dataset.f;
+        $('rk-tbody').innerHTML = tableRows();
+        el.querySelectorAll('.rk-card').forEach(c => c.classList.toggle('on', c.dataset.f === ROLLOUT_FILTER));
+        el.querySelectorAll('.rk-filter-btn').forEach(c => c.classList.toggle('on', c.dataset.f === ROLLOUT_FILTER));
+      });
+    });
+    $('rk-search').addEventListener('input', (e) => {
+      ROLLOUT_SEARCH = e.target.value.trim().toLowerCase();
+      $('rk-tbody').innerHTML = tableRows();
+    });
+  }
+
   // ---------- RENDER ----------
   function renderScopeTabs(){
     const tabs = [{ id: 'geral', nome: 'Visão Geral' }].concat(SHEETS.map(s => ({ id: s.id, nome: s.nome })));
@@ -625,19 +911,28 @@
     $('hd-projeto').textContent = META.projeto;
     updateSyncLabel();
 
+    if(CURRENT_SCOPE !== 'geral' && SYNC_STATE[CURRENT_SCOPE] === 'rollout'){
+      $('normal-views').hidden = true;
+      $('unsupported-note').hidden = true;
+      $('rollout-view').hidden = false;
+      renderRolloutView(CURRENT_SCOPE);
+      return;
+    }
     if(CURRENT_SCOPE !== 'geral' && SYNC_STATE[CURRENT_SCOPE] === 'unsupported'){
       const sheet = SHEETS.find(s => s.id === CURRENT_SCOPE);
       $('normal-views').hidden = true;
+      $('rollout-view').hidden = true;
       const note = $('unsupported-note');
       note.hidden = false;
-      note.innerHTML = 'Esta planilha ("' + escapeHtml(sheet ? sheet.nome : CURRENT_SCOPE) + '") não está no formato de agenda ' +
-        'padrão (é uma tabela diferente, ex.: acompanhamento de rollout por unidade) — este portal ainda não sabe ' +
-        'desenhar esse formato como linha do tempo/dashboard.' +
+      note.innerHTML = 'Esta planilha ("' + escapeHtml(sheet ? sheet.nome : CURRENT_SCOPE) + '") não está em nenhum formato ' +
+        'reconhecido por este portal (agenda de atividades ou matriz de rollout por unidade) — este portal ainda não sabe ' +
+        'desenhar esse formato.' +
         (ROLE === 'admin' && sheet ? '<br><br><a href="' + sheet.csv_url.replace('/export?format=csv','/edit') + '" target="_blank" rel="noopener">Abrir a planilha diretamente →</a>' : '');
       return;
     }
     $('normal-views').hidden = false;
     $('unsupported-note').hidden = true;
+    $('rollout-view').hidden = true;
 
     const scoped = visibleItems();
     const today = todayISO();
