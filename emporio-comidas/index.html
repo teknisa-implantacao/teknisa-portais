@@ -381,9 +381,10 @@
         <div class="hours-row">
           <div class="hstat"><b class="tabular" id="h-contratadas"></b><span>Horas contratadas</span></div>
           <div class="hstat"><b class="tabular" id="h-previstas"></b><span>Horas já agendadas</span></div>
+          <div class="hstat"><b class="tabular" id="h-realizadas"></b><span>Horas realizadas</span></div>
         </div>
         <div class="consume" id="consume-wrap" hidden>
-          <div class="consume-lab"><span>Consumo do total contratado</span><span class="tabular" id="consume-pct"></span></div>
+          <div class="consume-lab"><span>Consumo real do contratado (agendas concluídas)</span><span class="tabular" id="consume-pct"></span></div>
           <div class="consume-track"><div class="consume-fill" id="consume-fill"></div></div>
           <div class="consume-warn" id="consume-warn" hidden></div>
         </div>
@@ -1099,17 +1100,28 @@
     return h + (m||0)/60;
   }
 
+  // Soma as horas das agendas já CONCLUÍDAS no escopo atual — isso é o que
+  // realmente foi consumido do contrato, diferente de "horas já agendadas"
+  // (previstas), que inclui agendas futuras ainda não realizadas.
+  function horasRealizadas(){
+    return visibleItems()
+      .filter(i => i.concluido)
+      .reduce((sum, i) => sum + horasParaNumero(i.horas), 0);
+  }
+
   function renderHours(){
     const h = horasForScope();
     $('h-contratadas').textContent = fmtHoras(h.contratadas);
     $('h-previstas').textContent = fmtHoras(h.previstas);
 
     const contratadas = horasParaNumero(h.contratadas);
-    const previstas = horasParaNumero(h.previstas);
+    const realizadas = horasRealizadas();
+    $('h-realizadas').textContent = Math.round(realizadas) + 'h';
+
     const wrap = $('consume-wrap');
     if(!contratadas){ wrap.hidden = true; return; }
     wrap.hidden = false;
-    const pct = Math.min(999, Math.round(previstas/contratadas*100));
+    const pct = Math.min(999, Math.round(realizadas/contratadas*100));
     $('consume-pct').textContent = pct + '% consumido';
 
     const fill = $('consume-fill');
@@ -1119,10 +1131,10 @@
 
     if(pct >= 90){
       warn.hidden = false; warn.className = 'consume-warn critico';
-      warn.textContent = '⚠ Consumo de horas próximo ou acima do total contratado — vale alinhar com o cliente sobre horas adicionais.';
+      warn.textContent = '⚠ Horas realizadas próximas ou acima do total contratado — vale alinhar com o cliente sobre horas adicionais.';
     } else if(pct >= 70){
       warn.hidden = false; warn.className = 'consume-warn atencao';
-      warn.textContent = '⚠ Mais de 70% das horas contratadas já estão agendadas — acompanhar de perto o saldo restante.';
+      warn.textContent = '⚠ Mais de 70% das horas contratadas já foram realizadas — acompanhar de perto o saldo restante.';
     } else {
       warn.hidden = true;
     }
