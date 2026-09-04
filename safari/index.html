@@ -508,7 +508,8 @@
   }
 
   function tryCode(){
-    const v = limparCodigo($('gate-input').value);
+    const raw = $('gate-input').value;
+    const v = limparCodigo(raw);
     let role = null;
     if(v === limparCodigo(META.codigo_admin)) role = 'admin';
     else if(v === limparCodigo(META.codigo_acesso)) role = 'cliente';
@@ -516,7 +517,11 @@
       try{ localStorage.setItem(LS_KEY, '1'); localStorage.setItem(LS_ROLE_KEY, role); }catch(e){}
       unlock(role);
     } else {
-      $('gate-err').textContent = 'Código inválido. Confira com seu coordenador Teknisa.';
+      // Diagnóstico temporário: mostra exatamente o que o navegador capturou, pra
+      // identificar problemas de teclado/autocorreção específicos de um aparelho.
+      $('gate-err').innerHTML = 'Código inválido. Confira com seu coordenador Teknisa.' +
+        '<br><span style="font-family:monospace; font-size:10.5px; opacity:.7">recebido: "' + escapeHtml(raw) +
+        '" (' + raw.length + ' car.) · limpo: "' + escapeHtml(v) + '"</span>';
     }
   }
   $('gate-btn').addEventListener('click', tryCode);
