@@ -249,7 +249,37 @@
   .item-done.yes{background:var(--good-tint); color:var(--good)}
   .item-done.no{background:var(--surface-2); color:var(--ink-3)}
 
-  /* ---------- TIMELINE VIEW ---------- */
+  /* ---------- GANTT (uma linha por atividade) ---------- */
+  .gt-wrap{overflow-x:auto; border:1px solid var(--border); border-radius:12px}
+  .gt-row{display:flex; border-bottom:1px solid var(--surface-2)}
+  .gt-row:last-child{border-bottom:none}
+  .gt-row-label{
+    flex-shrink:0; position:sticky; left:0; z-index:2; background:var(--bg);
+    padding:8px 14px; font-size:12px; color:var(--ink); display:flex; align-items:center;
+    border-right:1px solid var(--border); overflow:hidden;
+  }
+  .gt-row-name{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .gt-row-track{position:relative; flex-shrink:0; min-height:34px}
+  .gt-axis-row{position:sticky; top:0; z-index:3; background:var(--bg)}
+  .gt-axis-label{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-2); background:var(--bg)}
+  .gt-axis-months{display:flex; height:34px}
+  .gt-month{flex-shrink:0; display:flex; align-items:center; font-size:11px; font-weight:700; color:var(--ink-2); text-transform:uppercase; letter-spacing:.04em; border-left:1px dashed var(--border); padding-left:8px}
+  .gt-today-line{position:absolute; top:0; bottom:0; width:2px; background:var(--crit); z-index:1}
+  .gt-today-lbl{position:absolute; top:2px; font-size:9.5px; font-weight:800; color:var(--crit); background:var(--bg); padding:0 3px; transform:translateX(-50%); z-index:2}
+  .gt-section-row .gt-row-label{font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--accent-deep); background:var(--surface-2)}
+  .gt-section-row .gt-row-track{background:var(--surface-2)}
+  .gt-bar{
+    position:absolute; top:8px; height:18px; border-radius:5px; background:var(--accent);
+    display:flex; align-items:center; padding:0 7px; white-space:nowrap; z-index:1;
+  }
+  .gt-bar.done{background:var(--good)}
+  .gt-bar.reservada{background:var(--ink-3)}
+  .gt-bar-date{font-size:10px; font-weight:700; color:#fff}
+  .gt-nodate{padding:10px 4px; border-top:1px dashed var(--border); margin-top:4px}
+  .gt-nodate:first-child{border-top:none; margin-top:0}
+  .gt-nodate-lbl{font-size:11px; font-weight:700; color:var(--ink-2); display:block; margin-bottom:6px}
+
+  /* ---------- TIMELINE VIEW (legado, mantido por compatibilidade de estilos) ---------- */
   #timeline{overflow-x:auto; padding-bottom:8px}
   .tl-inner{min-width:1000px; position:relative}
   .tl-axis{display:flex; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:4px; position:sticky; top:0; background:var(--bg)}
@@ -349,7 +379,7 @@
     <div class="toolbar">
       <div class="toggle">
         <button id="btn-macro" class="on">Visão macro</button>
-        <button id="btn-detalhe">Visão detalhada</button>
+        <button id="btn-detalhe">Gráfico Gantt</button>
       </div>
       <div class="admin-tools" id="admin-tools" hidden style="text-align:right">
         <div id="edit-links" style="margin-bottom:6px"></div>
@@ -1077,6 +1107,10 @@
     </div>`;
   }
 
+  // Gráfico de Gantt de verdade: uma linha por atividade, com uma barra na data
+  // correta; coluna de nomes fixa (sticky) enquanto a linha do tempo rola na
+  // horizontal. Atividades sem data ainda não entram no gráfico (não têm posição
+  // no eixo do tempo) — ficam listadas à parte, por seção, fora da área que rola.
   function renderTimeline(){
     const scoped = visibleItems();
     const dated = scoped.filter(i => i.data);
@@ -1086,13 +1120,11 @@
     const today = todayISO();
     const spanStart = min < today ? min : today;
     const spanEnd = max > today ? max : today;
-    const totalDays = daysBetween(spanStart, spanEnd) + 14;
-    const pxPerDay = 6;
-    const widthPx = Math.max(1000, totalDays * pxPerDay);
+    const totalDays = daysBetween(spanStart, spanEnd) + 10;
+    const pxPerDay = 8;
+    const trackW = Math.max(700, totalDays * pxPerDay);
+    const LABEL_W = 260;
 
-    // month axis
-    let axis = '';
-    let cursor = spanStart;
     let lastMonth = null;
     const monthStarts = [];
     for(let i=0;i<=totalDays;i++){
@@ -1100,43 +1132,66 @@
       const m = iso.slice(0,7);
       if(m !== lastMonth){ monthStarts.push({iso, offset: i}); lastMonth = m; }
     }
-    axis = monthStarts.map((ms,idx) => {
+    const axisMonths = monthStarts.map((ms,idx) => {
       const w = (idx < monthStarts.length-1 ? monthStarts[idx+1].offset - ms.offset : totalDays - ms.offset) * pxPerDay;
       const [y,mo] = ms.iso.split('-');
-      return `<div class="tl-month" style="width:${w}px">${MESES[parseInt(mo,10)-1]}/${y.slice(2)}</div>`;
+      return `<div class="gt-month" style="width:${w}px">${MESES[parseInt(mo,10)-1]}/${y.slice(2)}</div>`;
     }).join('');
-
-    const bySec = {};
-    dated.forEach(i => { (bySec[i.secao] = bySec[i.secao] || []).push(i); });
-    const noDateBySec = {};
-    scoped.filter(i=>!i.data).forEach(i => { (noDateBySec[i.secao] = noDateBySec[i.secao] || []).push(i); });
-
     const todayOffset = daysBetween(spanStart, today) * pxPerDay;
 
-    let lanes = Object.keys(bySec).map(sec => {
-      const dots = bySec[sec].map(i => {
+    const bySec = {};
+    scoped.forEach(i => { (bySec[i.secao] = bySec[i.secao] || []).push(i); });
+
+    let ganttHtml = '';
+    let noDateHtml = '';
+    Object.keys(bySec).forEach(sec => {
+      const items = bySec[sec];
+      const datedItems = items.filter(i => i.data).sort((a,b) => a.data.localeCompare(b.data));
+      const semData = items.filter(i => !i.data);
+      if(!datedItems.length) return;
+
+      ganttHtml += `<div class="gt-row gt-section-row">
+        <div class="gt-row-label" style="width:${LABEL_W}px">${escapeHtml(BUCKET_LABELS[sec] || sec || 'Outros')}</div>
+        <div class="gt-row-track" style="width:${trackW}px"></div>
+      </div>`;
+
+      datedItems.forEach(i => {
         const off = daysBetween(spanStart, i.data) * pxPerDay;
         const cls = i.concluido ? 'done' : (i.status_agenda !== 'Confirmada' ? 'reservada' : '');
-        return `<div class="tl-dot ${cls}" style="left:${off}px">
-          <div class="tl-tooltip">${escapeHtml(i.rotina)}<br>${fmtDate(i.data).label} · ${escapeHtml(i.status_agenda||'')}</div>
+        ganttHtml += `<div class="gt-row">
+          <div class="gt-row-label" style="width:${LABEL_W}px" title="${escapeHtml(i.rotina)}">
+            <span class="gt-row-name">${escapeHtml(i.rotina)}</span>
+          </div>
+          <div class="gt-row-track" style="width:${trackW}px">
+            <div class="gt-bar ${cls}" style="left:${off}px" title="${escapeHtml(i.rotina)} · ${fmtDate(i.data).label} · ${escapeHtml(i.status_agenda||'')}">
+              <span class="gt-bar-date">${fmtDate(i.data).label}</span>
+            </div>
+          </div>
         </div>`;
-      }).join('');
-      const noDate = (noDateBySec[sec]||[]).map(i => `<span class="no-date-chip">${escapeHtml(i.rotina)}</span>`).join('');
-      return `<div class="tl-lane">
-        <div class="tl-lane-name">${BUCKET_LABELS[sec] || sec}</div>
-        <div class="tl-track" style="width:${widthPx}px">${dots}</div>
-        ${noDate ? '<div class="no-date-list">'+noDate+'</div>' : ''}
-      </div>`;
-    }).join('');
+      });
 
-    $('timeline').innerHTML = `<div class="tl-inner" style="width:${widthPx}px">
-      <div class="tl-axis">${axis}</div>
-      <div style="position:relative">
-        <div class="tl-today" style="left:${todayOffset}px"></div>
-        <div class="tl-today-lbl" style="left:${todayOffset}px">hoje</div>
-        ${lanes}
+      if(semData.length){
+        noDateHtml += `<div class="gt-nodate">
+          <span class="gt-nodate-lbl">${escapeHtml(BUCKET_LABELS[sec] || sec || 'Outros')} — ainda sem data:</span>
+          <div class="no-date-list">${semData.map(i => `<span class="no-date-chip">${escapeHtml(i.rotina)}</span>`).join('')}</div>
+        </div>`;
+      }
+    });
+
+    $('timeline').innerHTML = `
+      <div class="gt-wrap">
+        <div class="gt-row gt-axis-row">
+          <div class="gt-row-label gt-axis-label" style="width:${LABEL_W}px">Atividade</div>
+          <div class="gt-row-track" style="width:${trackW}px">
+            <div class="gt-axis-months">${axisMonths}</div>
+            <div class="gt-today-line" style="left:${todayOffset}px"></div>
+            <div class="gt-today-lbl" style="left:${todayOffset}px">hoje</div>
+          </div>
+        </div>
+        ${ganttHtml}
       </div>
-    </div>`;
+      ${noDateHtml}
+    `;
   }
 
   function daysBetween(a,b){
