@@ -127,6 +127,15 @@
   .bucket-count{color:var(--ink-2); font-size:12px; white-space:nowrap}
 
   .hours-row{display:flex; gap:36px; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); flex-wrap:wrap}
+  .consume{margin-top:18px}
+  .consume-lab{display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:var(--ink-2); margin-bottom:8px}
+  .consume-track{background:var(--surface-2); border-radius:8px; height:14px; overflow:hidden}
+  .consume-fill{height:100%; border-radius:8px; background:var(--accent); transition:width .3s}
+  .consume-fill.ok{background:var(--good)}
+  .consume-fill.atencao{background:var(--warn)}
+  .consume-fill.critico{background:var(--crit)}
+  .consume-warn{margin-top:10px; padding:10px 14px; background:var(--warn-tint); color:var(--warn); border-left:3px solid var(--warn); border-radius:6px; font-size:12px; line-height:1.5}
+  .consume-warn.critico{background:var(--crit-tint); color:var(--crit); border-left-color:var(--crit)}
   .hstat b{display:block; font-size:22px; font-weight:800; letter-spacing:-.5px}
   .hstat span{font-size:11px; color:var(--ink-2); text-transform:uppercase; letter-spacing:.8px}
 
@@ -372,6 +381,11 @@
         <div class="hours-row">
           <div class="hstat"><b class="tabular" id="h-contratadas"></b><span>Horas contratadas</span></div>
           <div class="hstat"><b class="tabular" id="h-previstas"></b><span>Horas já agendadas</span></div>
+        </div>
+        <div class="consume" id="consume-wrap" hidden>
+          <div class="consume-lab"><span>Consumo do total contratado</span><span class="tabular" id="consume-pct"></span></div>
+          <div class="consume-track"><div class="consume-fill" id="consume-fill"></div></div>
+          <div class="consume-warn" id="consume-warn" hidden></div>
         </div>
       </div>
     </section>
@@ -1076,10 +1090,42 @@
     return (m ? m[0] : '0') + 'h';
   }
 
+  // Aceita "228:00:00" ou "120h" — devolve horas em número decimal (para % de consumo).
+  function horasParaNumero(v){
+    if(!v) return 0;
+    const s = String(v);
+    if(s.indexOf(':') === -1){ const m = s.match(/\d+/); return m ? Number(m[0]) : 0; }
+    const [h,m] = s.split(':').map(Number);
+    return h + (m||0)/60;
+  }
+
   function renderHours(){
     const h = horasForScope();
     $('h-contratadas').textContent = fmtHoras(h.contratadas);
     $('h-previstas').textContent = fmtHoras(h.previstas);
+
+    const contratadas = horasParaNumero(h.contratadas);
+    const previstas = horasParaNumero(h.previstas);
+    const wrap = $('consume-wrap');
+    if(!contratadas){ wrap.hidden = true; return; }
+    wrap.hidden = false;
+    const pct = Math.min(999, Math.round(previstas/contratadas*100));
+    $('consume-pct').textContent = pct + '% consumido';
+
+    const fill = $('consume-fill');
+    const warn = $('consume-warn');
+    fill.style.width = Math.min(100, pct) + '%';
+    fill.className = 'consume-fill ' + (pct >= 90 ? 'critico' : pct >= 70 ? 'atencao' : 'ok');
+
+    if(pct >= 90){
+      warn.hidden = false; warn.className = 'consume-warn critico';
+      warn.textContent = '⚠ Consumo de horas próximo ou acima do total contratado — vale alinhar com o cliente sobre horas adicionais.';
+    } else if(pct >= 70){
+      warn.hidden = false; warn.className = 'consume-warn atencao';
+      warn.textContent = '⚠ Mais de 70% das horas contratadas já estão agendadas — acompanhar de perto o saldo restante.';
+    } else {
+      warn.hidden = true;
+    }
   }
 
   function renderMacro(){
