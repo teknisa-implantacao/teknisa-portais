@@ -137,6 +137,12 @@
   .load-text{font-size:14px; color:var(--ink-2)}
   .load-retry{padding:9px 18px; border-radius:8px; border:1.5px solid var(--accent); background:var(--accent-tint); color:var(--accent-deep); font-family:inherit; font-size:13px; font-weight:700; cursor:pointer}
 
+  #unsupported-note{
+    padding:40px 24px; text-align:center; color:var(--ink-2); font-size:14px; line-height:1.6;
+    border:1.5px dashed var(--border); border-radius:14px; margin-bottom:24px;
+  }
+  #unsupported-note a{color:var(--accent); font-weight:700}
+
   /* ---------- SCOPE TABS ---------- */
   .scope-tabs{display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap}
   .scope-tab{
@@ -251,6 +257,9 @@
     <div id="load-state"></div>
 
     <div id="content-wrap" hidden>
+    <div class="scope-tabs" id="scope-tabs"></div>
+    <div id="unsupported-note" hidden></div>
+    <div id="normal-views">
     <section class="hero">
       <div class="hero-card next-card">
         <div class="next-lbl">Próxima agenda confirmada</div>
@@ -278,8 +287,6 @@
       </div>
     </section>
 
-    <div class="scope-tabs" id="scope-tabs"></div>
-
     <div class="toolbar">
       <div class="toggle">
         <button id="btn-macro" class="on">Visão macro</button>
@@ -296,6 +303,7 @@
     <div id="view-detalhe" hidden>
       <div id="timeline"></div>
     </div>
+    </div><!-- /normal-views -->
     </div><!-- /content-wrap -->
 
     <footer>Gerado a partir do cronograma oficial Teknisa · dúvidas, fale com seu coordenador de projeto</footer>
@@ -327,7 +335,13 @@
   function horasForScope(){
     if(CURRENT_SCOPE !== 'geral') return HORAS_BY_SHEET[CURRENT_SCOPE] || {contratadas:null, previstas:null};
     const somaH = (a,b) => {
-      const toMin = (s) => { if(!s) return 0; const [h,m] = s.split(':').map(Number); return h*60+(m||0); };
+      // aceita "228:00:00" ou "120h" — quando não há ":", trata o número como horas cheias.
+      const toMin = (s) => {
+        if(!s) return 0;
+        if(s.indexOf(':') === -1){ const m = String(s).match(/\d+/); return m ? Number(m[0])*60 : 0; }
+        const [h,m] = s.split(':').map(Number);
+        return h*60+(m||0);
+      };
       const total = toMin(a) + toMin(b);
       return Math.floor(total/60) + ':' + String(total%60).padStart(2,'0') + ':00';
     };
@@ -422,7 +436,13 @@
     let anyLive = false;
     results.forEach((r, idx) => {
       const sheetId = SHEETS[idx].id;
-      if(r.status === 'fulfilled' && r.value.parsed.itens.length){
+      if(r.status === 'fulfilled' && r.value.parsed.formatoReconhecido === false){
+        // a planilha respondeu, mas não está no formato de agenda (ex.: uma matriz
+        // de acompanhamento de rollout) — não é uma falha de conexão, é só um tipo
+        // de conteúdo que esta visão ainda não sabe desenhar.
+        SYNC_STATE[sheetId] = 'unsupported';
+        HORAS_BY_SHEET[sheetId] = HORAS_BY_SHEET[sheetId] || {};
+      } else if(r.status === 'fulfilled' && r.value.parsed.itens.length){
         ITEMS = ITEMS.filter(i => i.sheet_id !== sheetId)
           .concat(r.value.parsed.itens.map(it => Object.assign(it, { sheet_id: sheetId })));
         HORAS_BY_SHEET[sheetId] = r.value.parsed.horas;
@@ -434,8 +454,9 @@
       }
     });
 
-    if(anyLive){
-      LAST_SYNC = new Date();
+    const anyResponded = Object.values(SYNC_STATE).some(v => v === 'live' || v === 'unsupported');
+    if(anyLive) LAST_SYNC = new Date();
+    if(anyResponded){
       LOADED = true;
       showContent();
       render();
@@ -497,39 +518,84 @@
     return yyyy + '-' + mo.padStart(2,'0') + '-' + d.padStart(2,'0');
   }
 
+  // Normaliza um cabeçalho de coluna para comparação (maiúsculas, sem acento, sem espaço extra)
+  function normHeader(s){
+    return (s||'').trim().toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  // Planilhas de clientes diferentes variam um pouco nas colunas (algumas têm
+  // ATIVIDADE e DESCRICAO separadas, outras só uma coluna combinada). Mapeamos por
+  // nome de cabeçalho em vez de posição fixa, para funcionar em qualquer um desses
+  // formatos sem precisar tratar cliente por cliente.
+  function mapColunas(headerRow){
+    const idx = {};
+    headerRow.forEach((h, i) => {
+      const n = normHeader(h);
+      if(n.startsWith('ROTINA')) idx.rotina = i;
+      else if(n === 'DATA') idx.data = i;
+      else if(n.startsWith('DIA DA SEMANA')) idx.dia = i;
+      else if(n.startsWith('HORARIO')) idx.horario = i;
+      else if(n.startsWith('TOTAL DE HORAS') || n === 'HORAS') idx.horas = i;
+      else if(n.startsWith('STATUS')) idx.status = i;
+      else if(n.startsWith('STAKEHOLDER')) idx.stakeholder = i;
+      else if(n.startsWith('ATIVIDADE')) idx.atividade = i;
+      else if(n.startsWith('DESCRICAO')) idx.descricao = i;
+      else if(n.startsWith('CONCLU')) idx.concluido = i;
+    });
+    return idx;
+  }
+
   function parseCronogramaCsv(text, horasFallback){
     const rows = parseCsv(text);
-    let headerIdx = rows.findIndex(r => (r[0]||'').trim() === 'ROTINAS');
-    if(headerIdx === -1) return { itens: [], horas: horasFallback || {} };
+    const headerIdx = rows.findIndex(r => normHeader(r[0]).startsWith('ROTINA'));
+    if(headerIdx === -1){
+      return { itens: [], horas: horasFallback || {}, formatoReconhecido: false };
+    }
+    const col = mapColunas(rows[headerIdx]);
     let secao = null;
     const itens = [];
     let uid = 1;
     const horas = { contratadas: (horasFallback||{}).contratadas, previstas: (horasFallback||{}).previstas };
+    const get = (r, key) => col[key] !== undefined ? (r[col[key]]||'').trim() : '';
+
     for(const raw of rows.slice(headerIdx+1)){
       const r = raw.map(c => (c||'').trim());
-      const [rotina, data, dia, horario, hrs, status, stakeholder, desc, concluido] = r;
       const joined = r.join('');
       if(!joined) continue;
-      if(/Horas Contratadas/i.test(joined)){ horas.contratadas = (r.find(c => /:/.test(c)) || horas.contratadas); continue; }
-      if(/Total de Horas Previstas/i.test(joined)){ horas.previstas = (r.find(c => /:/.test(c)) || horas.previstas); continue; }
-      if(/^(RETAGUARDA|ROLLOUTS)$/i.test(rotina)){ secao = rotina.toUpperCase(); continue; }
-      if(rotina && !data && !status && !concluido && !hrs){ secao = rotina; continue; }
+      // valor pode vir como "228:00:00" ou só "120h" — aceita qualquer célula não
+      // vazia que não seja o próprio rótulo.
+      const valorHoras = (label) => r.find(c => c && !new RegExp(label, 'i').test(c));
+      if(/Horas Contratadas/i.test(joined)){ horas.contratadas = valorHoras('Horas Contratadas') || horas.contratadas; continue; }
+      if(/Total de Horas Previstas/i.test(joined)){ horas.previstas = valorHoras('Total de Horas Previstas') || horas.previstas; continue; }
+
+      const rotina = get(r, 'rotina');
+      const data = get(r, 'data');
+      const status = get(r, 'status');
+      const concluido = get(r, 'concluido');
+      const hrs = get(r, 'horas');
+
       if(!rotina) continue;
+      if(!data && !status && !concluido && !hrs){ secao = rotina; continue; }
+
+      const atividade = get(r, 'atividade');
+      const descricaoCol = get(r, 'descricao');
+      const descricao = [...new Set([atividade, descricaoCol].filter(Boolean))].join(' — ');
+
       itens.push({
         uid: uid++,
         secao: secao,
         rotina: rotina,
         data: parseDataBR(data),
-        dia_semana: dia,
-        horario: horario,
+        dia_semana: get(r, 'dia'),
+        horario: get(r, 'horario'),
         horas: hrs,
         status_agenda: status,
-        stakeholder: stakeholder,
-        descricao: desc,
-        concluido: (concluido||'').toLowerCase() === 'sim',
+        stakeholder: get(r, 'stakeholder'),
+        descricao: descricao,
+        concluido: concluido.toLowerCase() === 'sim',
       });
     }
-    return { itens, horas };
+    return { itens, horas, formatoReconhecido: true };
   }
 
   // ---------- RENDER ----------
@@ -558,6 +624,20 @@
     $('hd-cliente').textContent = META.cliente;
     $('hd-projeto').textContent = META.projeto;
     updateSyncLabel();
+
+    if(CURRENT_SCOPE !== 'geral' && SYNC_STATE[CURRENT_SCOPE] === 'unsupported'){
+      const sheet = SHEETS.find(s => s.id === CURRENT_SCOPE);
+      $('normal-views').hidden = true;
+      const note = $('unsupported-note');
+      note.hidden = false;
+      note.innerHTML = 'Esta planilha ("' + escapeHtml(sheet ? sheet.nome : CURRENT_SCOPE) + '") não está no formato de agenda ' +
+        'padrão (é uma tabela diferente, ex.: acompanhamento de rollout por unidade) — este portal ainda não sabe ' +
+        'desenhar esse formato como linha do tempo/dashboard.' +
+        (ROLE === 'admin' && sheet ? '<br><br><a href="' + sheet.csv_url.replace('/export?format=csv','/edit') + '" target="_blank" rel="noopener">Abrir a planilha diretamente →</a>' : '');
+      return;
+    }
+    $('normal-views').hidden = false;
+    $('unsupported-note').hidden = true;
 
     const scoped = visibleItems();
     const today = todayISO();
@@ -656,10 +736,17 @@
     }).join('');
   }
 
+  // Aceita "228:00:00" (formato HH:MM:SS) ou "120h" / "120" — extrai só as horas inteiras.
+  function fmtHoras(v){
+    if(!v) return '0h';
+    const m = String(v).match(/\d+/);
+    return (m ? m[0] : '0') + 'h';
+  }
+
   function renderHours(){
     const h = horasForScope();
-    $('h-contratadas').textContent = (h.contratadas || '0').split(':')[0] + 'h';
-    $('h-previstas').textContent = (h.previstas || '0').split(':')[0] + 'h';
+    $('h-contratadas').textContent = fmtHoras(h.contratadas);
+    $('h-previstas').textContent = fmtHoras(h.previstas);
   }
 
   function renderMacro(){
