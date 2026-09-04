@@ -284,7 +284,7 @@
     <div class="gate-title">Portal de Acompanhamento</div>
     <div class="gate-sub">Digite o código do projeto enviado pelo seu coordenador Teknisa para acompanhar o cronograma de implantação.</div>
     <label class="gate-label" for="gate-input">Código do projeto</label>
-    <input id="gate-input" type="text" autocomplete="off" spellcheck="false" placeholder="Ex.: EMPORIO2026">
+    <input id="gate-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="Ex.: EMPORIO2026">
     <button id="gate-btn">Acessar cronograma</button>
     <div id="gate-err"></div>
   </div>
@@ -455,11 +455,19 @@
     $('load-state').hidden = true;
     $('content-wrap').hidden = false;
   }
+  // Remove tudo que não for letra/número antes de comparar — teclados de celular
+  // às vezes inserem espaços especiais, autocorreção ou pontuação invisível, e o
+  // código não é uma senha de segurança real (só um filtro leve), então vale ser
+  // tolerante aqui.
+  function limparCodigo(s){
+    return (s||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Z0-9]/g, '');
+  }
+
   function tryCode(){
-    const v = $('gate-input').value.trim().toUpperCase();
+    const v = limparCodigo($('gate-input').value);
     let role = null;
-    if(v === (META.codigo_admin || '').toUpperCase()) role = 'admin';
-    else if(v === (META.codigo_acesso || '').toUpperCase()) role = 'cliente';
+    if(v === limparCodigo(META.codigo_admin)) role = 'admin';
+    else if(v === limparCodigo(META.codigo_acesso)) role = 'cliente';
     if(role){
       try{ localStorage.setItem(LS_KEY, '1'); localStorage.setItem(LS_ROLE_KEY, role); }catch(e){}
       unlock(role);
