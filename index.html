@@ -1,4 +1,5 @@
 <title>Painel de Cronogramas — Pamela Maia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Painel central dos portais de acompanhamento de cronograma dos clientes Teknisa.">
 <style>
   :root{
@@ -84,7 +85,7 @@
   <footer>Cada portal busca os dados ao vivo direto da planilha do cliente — nada fica salvo aqui.</footer>
 </div>
 
-<script id="hub-data" type="application/json">{"meta": {"titulo": "Painel de Cronogramas — Pamela Maia", "codigo_admin": "ACESSOGERAL"}, "clientes": [{"nome": "Empório de Comidas", "projeto": "Retail – Empório de Comidas", "slug": "emporio-comidas", "codigo_cliente": "EMPORIO2026"}, {"nome": "Safari Fábrica", "projeto": "Teknisa Retail BRSS – Safari", "slug": "safari", "codigo_cliente": "SAFARI2026"}, {"nome": "Duo Gelatto", "projeto": "Retail BRSS – Duo Gelatto", "slug": "duo-gelatto", "codigo_cliente": "DUOGELATTO2026"}, {"nome": "Luss Cervejaria (Baden Baden)", "projeto": "Teknisa Retail BR – Luss Cervejaria", "slug": "luss-cervejaria", "codigo_cliente": "LUSS2026"}]}</script>
+<script id="hub-data" type="application/json">{"meta": {"titulo": "Painel de Cronogramas — Pamela Maia", "codigo_admin": "ACESSOGERAL"}, "clientes": [{"nome": "Empório de Comidas", "projeto": "Retail – Empório de Comidas", "slug": "emporio-comidas", "codigo_cliente": "EMPORIO2026"}, {"nome": "Safari Fábrica", "projeto": "Teknisa Retail BRSS – Safari", "slug": "safari", "codigo_cliente": "SAFARI2026"}, {"nome": "Duo Gelatto", "projeto": "Retail BRSS – Duo Gelatto", "slug": "duo-gelatto", "codigo_cliente": "DUOGELATTO2026"}, {"nome": "Luss Cervejaria (Baden Baden)", "projeto": "Teknisa Retail BR – Luss Cervejaria", "slug": "luss-cervejaria", "codigo_cliente": "LUSS2026"}, {"nome": "Cachorrão do Claudião", "projeto": "Teknisa Retail BR – Cachorrão do Claudião", "slug": "cachorrao-do-claudiao", "codigo_cliente": "CACHORRAO2026"}]}</script>
 <script>
 (function(){
   const DADOS = JSON.parse(document.getElementById('hub-data').textContent);
@@ -95,15 +96,12 @@
   }
 
   function tryCode(){
-    const raw = $('gate-input').value;
-    const v = limparCodigo(raw);
+    const v = limparCodigo($('gate-input').value);
     if(v === limparCodigo(DADOS.meta.codigo_admin)){
       try{ localStorage.setItem('hub_ok', '1'); }catch(e){}
       unlock();
     } else {
-      $('gate-err').innerHTML = 'Código inválido.' +
-        '<br><span style="font-family:monospace; font-size:10.5px; opacity:.7">recebido: "' + escapeHtml(raw) +
-        '" (' + raw.length + ' car.) · limpo: "' + escapeHtml(v) + '"</span>';
+      $('gate-err').textContent = 'Código inválido.';
     }
   }
   function unlock(){
