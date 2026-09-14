@@ -683,9 +683,18 @@
       const r = raw.map(c => (c||'').trim());
       const joined = r.join('');
       if(!joined) continue;
-      // valor pode vir como "228:00:00" ou só "120h" — aceita qualquer célula não
-      // vazia que não seja o próprio rótulo.
-      const valorHoras = (label) => r.find(c => c && !new RegExp(label, 'i').test(c));
+      // valor pode vir como "228:00:00" ou só "120h" — procura uma célula com essa
+      // cara primeiro (evita pegar sobra de texto de outra coluna, ex.: quando a
+      // linha do rótulo ainda tem conteúdo de uma atividade na primeira coluna).
+      // Só cai no "qualquer célula não vazia que não seja o rótulo" se nada bater
+      // no formato esperado.
+      const valorHoras = (label) => {
+        const formatoHora = r.find(c => c && /^\d{1,5}(:\d{2}){1,2}$/.test(c.trim()));
+        if(formatoHora) return formatoHora.trim();
+        const formatoH = r.find(c => c && /^\d+\s*h$/i.test(c.trim()));
+        if(formatoH) return formatoH.trim();
+        return r.find(c => c && !new RegExp(label, 'i').test(c));
+      };
       if(/Horas Contratadas/i.test(joined)){ horas.contratadas = valorHoras('Horas Contratadas') || horas.contratadas; continue; }
       if(/Total de Horas Previstas/i.test(joined)){ horas.previstas = valorHoras('Total de Horas Previstas') || horas.previstas; continue; }
 
